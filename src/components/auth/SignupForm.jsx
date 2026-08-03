@@ -39,12 +39,8 @@ export default function SignupForm({ }) {
       password: formData.password,
     });
 
-    alert("Registration successful! Please verify your email.");
-    navigate("/verify-email", {
-      state: {
-        email: formData.email,
-      },
-    });
+    alert(res.data.message);
+    navigate("/login");
   } catch (err) {
     alert(err.response?.data?.message || "Registration Failed");
   }

@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { FaLanguage, FaExchangeAlt, FaSpinner, FaCopy, FaCheck } from "react-icons/fa";
+import {
+  FaLanguage,
+  FaExchangeAlt,
+  FaSpinner,
+  FaCopy,
+  FaCheck,
+} from "react-icons/fa";
 import { chatWithAI } from "../../api/aiApi";
-
 const languages = [
   "English",
   "Hindi",
@@ -12,7 +17,6 @@ const languages = [
   "Japanese",
   "Chinese",
 ];
-
 export default function Translator() {
   const [sourceText, setSourceText] = useState("");
   const [sourceLang, setSourceLang] = useState("English");
@@ -20,21 +24,17 @@ export default function Translator() {
   const [translated, setTranslated] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const handleTranslate = async () => {
     if (!sourceText.trim() || loading) return;
-
     setLoading(true);
     setCopied(false);
-
     try {
       const token = localStorage.getItem("token");
-
       const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Only return the translated text, nothing else:\n\n${sourceText}`;
-
       const res = await chatWithAI(prompt, token);
-
       setTranslated(res.data.reply);
+      localStorage.setItem("credits", res.data.credits);
+      window.dispatchEvent(new Event("creditsUpdated"));
     } catch (err) {
       setTranslated("⚠️ AI is unavailable right now.");
       console.log(err);
@@ -42,29 +42,27 @@ export default function Translator() {
       setLoading(false);
     }
   };
-
   const handleSwap = () => {
     setSourceLang(targetLang);
     setTargetLang(sourceLang);
   };
-
   const handleCopy = async () => {
     if (!translated) return;
     await navigator.clipboard.writeText(translated);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
-
   return (
     <div className="flex h-[calc(100vh-120px)] flex-col rounded-3xl border border-white/10 bg-white/5">
       <div className="flex items-center gap-3 border-b border-white/10 p-6">
         <FaLanguage className="text-3xl text-cyan-400" />
         <div>
           <h2 className="text-2xl font-bold text-white">Translator</h2>
-          <p className="text-slate-400">Translate text between languages instantly</p>
+          <p className="text-slate-400">
+            Translate text between languages instantly
+          </p>
         </div>
       </div>
-
       <div className="flex items-center justify-center gap-4 border-b border-white/10 p-6">
         <select
           value={sourceLang}
@@ -77,14 +75,12 @@ export default function Translator() {
             </option>
           ))}
         </select>
-
         <button
           onClick={handleSwap}
           className="rounded-xl border border-white/10 p-3 text-cyan-400 transition hover:bg-white/10"
         >
           <FaExchangeAlt />
         </button>
-
         <select
           value={targetLang}
           onChange={(e) => setTargetLang(e.target.value)}
@@ -106,7 +102,6 @@ export default function Translator() {
             className="h-full min-h-[200px] rounded-2xl border border-white/10 bg-[#111827] p-5 text-white outline-none placeholder:text-slate-500"
           />
         </div>
-
         <div className="flex flex-col rounded-2xl border border-white/10 bg-[#0b0f1a] p-5">
           {!translated ? (
             <div className="flex h-full flex-col items-center justify-center text-slate-500">
@@ -115,7 +110,9 @@ export default function Translator() {
             </div>
           ) : (
             <>
-              <p className="flex-1 whitespace-pre-wrap text-white">{translated}</p>
+              <p className="flex-1 whitespace-pre-wrap text-white">
+                {translated}
+              </p>
               <button
                 onClick={handleCopy}
                 className="mt-4 flex items-center gap-2 self-start rounded-xl border border-white/10 px-4 py-2 text-sm text-cyan-400 hover:bg-white/10"
@@ -127,7 +124,6 @@ export default function Translator() {
           )}
         </div>
       </div>
-
       <div className="border-t border-white/10 p-6">
         <button
           onClick={handleTranslate}

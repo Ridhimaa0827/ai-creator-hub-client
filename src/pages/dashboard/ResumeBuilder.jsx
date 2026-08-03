@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { FaFileAlt, FaMagic, FaSpinner, FaDownload } from "react-icons/fa";
 import { chatWithAI } from "../../api/aiApi";
-
 export default function ResumeBuilder() {
   const [form, setForm] = useState({
     name: "",
@@ -11,30 +10,24 @@ export default function ResumeBuilder() {
   });
   const [loading, setLoading] = useState(false);
   const [resume, setResume] = useState("");
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleGenerate = async () => {
     if (!form.name.trim() || !form.role.trim() || loading) return;
-
     setLoading(true);
-
     try {
       const token = localStorage.getItem("token");
-
       const prompt = `Write a professional resume in plain text for:
 Name: ${form.name}
 Target Role: ${form.role}
 Experience/Projects: ${form.experience || "Not provided"}
 Skills: ${form.skills || "Not provided"}
-
 Format it with clear sections (Summary, Experience, Skills). Keep it concise and ready to use.`;
-
       const res = await chatWithAI(prompt, token);
-
       setResume(res.data.reply);
+      localStorage.setItem("credits", res.data.credits);
+      window.dispatchEvent(new Event("creditsUpdated"));
     } catch (err) {
       setResume("⚠️ AI is unavailable right now.");
       console.log(err);
@@ -42,7 +35,6 @@ Format it with clear sections (Summary, Experience, Skills). Keep it concise and
       setLoading(false);
     }
   };
-
   const handleDownload = () => {
     if (!resume) return;
     const blob = new Blob([resume], { type: "text/plain" });
@@ -53,17 +45,17 @@ Format it with clear sections (Summary, Experience, Skills). Keep it concise and
     a.click();
     URL.revokeObjectURL(url);
   };
-
   return (
     <div className="flex h-[calc(100vh-120px)] flex-col rounded-3xl border border-white/10 bg-white/5">
       <div className="flex items-center gap-3 border-b border-white/10 p-6">
         <FaFileAlt className="text-3xl text-cyan-400" />
         <div>
           <h2 className="text-2xl font-bold text-white">Resume Builder</h2>
-          <p className="text-slate-400">Fill your details and generate a resume draft</p>
+          <p className="text-slate-400">
+            Fill your details and generate a resume draft
+          </p>
         </div>
       </div>
-
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-6 lg:flex-row">
         <div className="flex-1 space-y-4">
           <input
@@ -98,7 +90,6 @@ Format it with clear sections (Summary, Experience, Skills). Keep it concise and
             rows={3}
             className="w-full rounded-2xl border border-white/10 bg-[#111827] px-5 py-3 text-white outline-none placeholder:text-slate-500"
           />
-
           <button
             onClick={handleGenerate}
             disabled={loading}
@@ -108,7 +99,6 @@ Format it with clear sections (Summary, Experience, Skills). Keep it concise and
             {loading ? "Generating..." : "Generate Resume"}
           </button>
         </div>
-
         <div className="flex-1 rounded-2xl border border-white/10 bg-[#0b0f1a] p-6">
           {!resume ? (
             <div className="flex h-full flex-col items-center justify-center text-slate-500">

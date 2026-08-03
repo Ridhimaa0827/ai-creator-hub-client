@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { FaChartBar, FaUpload, FaSpinner, FaFileCsv } from "react-icons/fa";
 import { chatWithAI } from "../../api/aiApi";
-
-const MAX_CHARS = 6000; 
-
+const MAX_CHARS = 6000;
 export default function DataAnalyzer() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
-
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0];
     if (selected) {
@@ -16,7 +13,6 @@ export default function DataAnalyzer() {
       setSummary("");
     }
   };
-
   const readFileAsText = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -25,30 +21,24 @@ export default function DataAnalyzer() {
       reader.readAsText(file);
     });
   };
-
   const handleAnalyze = async () => {
     if (!file || loading) return;
-
-    // XLSX is a binary format and can't be read as plain text directly.
     if (file.name.toLowerCase().endsWith(".xlsx")) {
       setSummary(
-        "⚠️ XLSX files aren't supported yet — please export/save as CSV and upload that instead."
+        "⚠️ XLSX files aren't supported yet — please export/save as CSV and upload that instead.",
       );
       return;
     }
-
     setLoading(true);
-
     try {
       const token = localStorage.getItem("token");
       const rawText = await readFileAsText(file);
       const truncated = rawText.slice(0, MAX_CHARS);
-
       const prompt = `Analyze the following ${file.name.endsWith(".json") ? "JSON" : "CSV"} data and give a clear summary: key columns/fields, patterns, notable numbers, and any obvious issues. Data:\n\n${truncated}${rawText.length > MAX_CHARS ? "\n\n(...truncated, file is larger than shown)" : ""}`;
-
       const res = await chatWithAI(prompt, token);
-
       setSummary(res.data.reply);
+      localStorage.setItem("credits", res.data.credits);
+      window.dispatchEvent(new Event("creditsUpdated"));
     } catch (err) {
       setSummary("⚠️ AI is unavailable right now.");
       console.log(err);
@@ -56,7 +46,6 @@ export default function DataAnalyzer() {
       setLoading(false);
     }
   };
-
   return (
     <div className="flex h-[calc(100vh-120px)] flex-col rounded-3xl border border-white/10 bg-white/5">
       {/* Header */}
@@ -64,7 +53,9 @@ export default function DataAnalyzer() {
         <FaChartBar className="text-3xl text-cyan-400" />
         <div>
           <h2 className="text-2xl font-bold text-white">Data Analyzer</h2>
-          <p className="text-slate-400">Upload a CSV or JSON file and get an instant summary</p>
+          <p className="text-slate-400">
+            Upload a CSV or JSON file and get an instant summary
+          </p>
         </div>
       </div>
       <div className="border-b border-white/10 p-6">
@@ -78,7 +69,6 @@ export default function DataAnalyzer() {
             className="hidden"
           />
         </label>
-
         <button
           onClick={handleAnalyze}
           disabled={!file || loading}
@@ -96,7 +86,9 @@ export default function DataAnalyzer() {
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-[#0b0f1a] p-6">
-            <pre className="whitespace-pre-wrap text-sm text-slate-200">{summary}</pre>
+            <pre className="whitespace-pre-wrap text-sm text-slate-200">
+              {summary}
+            </pre>
           </div>
         )}
       </div>

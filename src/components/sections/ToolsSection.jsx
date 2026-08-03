@@ -70,7 +70,7 @@ const tools = [
 ];
 export default function ToolsSection() {
   return (
-    <section className="relative py-28">
+    <section id="tools" className="relative py-28">
       <div className="mx-auto max-w-7xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 40 }}

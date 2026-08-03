@@ -15,11 +15,22 @@ export const chatWithAI = (prompt, token) => {
     }
   );
 };
-
 export const getHistory = (token) => {
   return API.get("/history", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const generateCode = (prompt, token) => {
+  return API.post(
+    "/code",
+    { prompt },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 };

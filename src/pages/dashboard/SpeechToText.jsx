@@ -1,78 +1,71 @@
 import { useState, useRef } from "react";
 import { FaMicrophone, FaStop, FaCopy, FaCheck } from "react-icons/fa";
-import { chatWithAI } from "../../api/aiApi";
-
 export default function SpeechToText() {
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const recognitionRef = useRef(null);
-
   const handleToggle = () => {
     if (listening) {
       recognitionRef.current?.stop();
       setListening(false);
       return;
     }
-
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-
     if (!SpeechRecognition) {
-      setError("Speech recognition is not supported in this browser. Try Chrome.");
+      setError(
+        "Speech recognition is not supported in this browser. Try Chrome.",
+      );
       return;
     }
-
     setError("");
-
-   
-
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-IN";
-
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
     recognition.onresult = (event) => {
-      let text = "";
-      for (let i = 0; i < event.results.length; i++) {
-        text += event.results[i][0].transcript;
-      }
-      setTranscript(text);
+      console.log(event);
+      alert(event.results[0][0].transcript);
+      setTranscript(event.results[0][0].transcript);
     };
-
+    recognition.onstart = () => {
+      console.log("Listening...");
+    };
+    recognition.onend = () => {
+      console.log("Stopped");
+      setListening(false);
+    };
     recognition.onerror = (event) => {
       setError(`Error: ${event.error}`);
       setListening(false);
     };
-
     recognition.onend = () => {
       setListening(false);
     };
-
     recognitionRef.current = recognition;
     recognition.start();
+    alert("Recognition Started");
     setListening(true);
   };
-
   const handleCopy = async () => {
     if (!transcript) return;
     await navigator.clipboard.writeText(transcript);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
-
   return (
     <div className="flex h-[calc(100vh-120px)] flex-col rounded-3xl border border-white/10 bg-white/5">
-     
       <div className="flex items-center gap-3 border-b border-white/10 p-6">
         <FaMicrophone className="text-3xl text-cyan-400" />
         <div>
           <h2 className="text-2xl font-bold text-white">Speech to Text</h2>
-          <p className="text-slate-400">Speak and get an instant text transcript</p>
+          <p className="text-slate-400">
+            Speak and get an instant text transcript
+          </p>
         </div>
       </div>
-
       <div className="flex flex-col items-center justify-center gap-4 border-b border-white/10 p-10">
         <button
           onClick={handleToggle}
@@ -89,8 +82,6 @@ export default function SpeechToText() {
         </p>
         {error && <p className="text-sm text-red-400">{error}</p>}
       </div>
-
-    
       <div className="flex-1 overflow-y-auto p-8">
         {!transcript ? (
           <div className="flex h-full flex-col items-center justify-center text-slate-500">
