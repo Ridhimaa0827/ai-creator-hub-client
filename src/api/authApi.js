@@ -1,6 +1,6 @@
 import axios from "axios";
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/auth",
+  baseURL: "https://ai-creator-hub-server.onrender.com/api/auth",
 });
 export const registerUser = (userData) => {
   return API.post("/register", userData);

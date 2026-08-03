@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/ai",
+  baseURL: "https://ai-creator-hub-server.onrender.com/api/ai",
 });
 
 export const chatWithAI = (prompt, token) => {
