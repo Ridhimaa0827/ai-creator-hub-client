@@ -1,14 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  FaEnvelope,
-  FaLock,
-  FaGoogle,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
-import { loginUser } from "../../api/authApi";
+import { GoogleLogin } from "@react-oauth/google";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { loginUser, googleLoginUser } from "../../api/authApi";
 export default function LoginForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -32,18 +27,18 @@ export default function LoginForm() {
       window.dispatchEvent(new Event("creditsUpdated"));
       navigate("/dashboard");
     } catch (err) {
-  const message = err.response?.data?.message;
-  if (message === "Please verify your email first.") {
-    alert(message);
-    navigate("/verify-email", {
-      state: {
-        email: formData.email,
-      },
-    });
-    return;
-  }
-  alert(message || "Login Failed");
-}
+      const message = err.response?.data?.message;
+      if (message === "Please verify your email first.") {
+        alert(message);
+        navigate("/verify-email", {
+          state: {
+            email: formData.email,
+          },
+        });
+        return;
+      }
+      alert(message || "Login Failed");
+    }
   };
   return (
     <motion.form
@@ -51,7 +46,8 @@ export default function LoginForm() {
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="space-y-5">
+      className="space-y-5"
+    >
       <div>
         <label className="mb-2 block text-sm text-slate-300">
           Email Address
@@ -69,9 +65,7 @@ export default function LoginForm() {
         </div>
       </div>
       <div>
-        <label className="mb-2 block text-sm text-slate-300">
-          Password
-        </label>
+        <label className="mb-2 block text-sm text-slate-300">Password</label>
         <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 px-4">
           <FaLock className="text-cyan-400" />
           <input
@@ -115,13 +109,32 @@ export default function LoginForm() {
           OR
         </span>
       </div>
-      <button
-        type="button"
-        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-3 text-white transition hover:bg-white/10"
-      >
-        <FaGoogle className="text-red-400" />
-        Continue with Google
-      </button>
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+          try {
+            const res = await googleLoginUser(credentialResponse.credential);
+
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            localStorage.setItem("credits", res.data.user.credits);
+
+            window.dispatchEvent(new Event("creditsUpdated"));
+
+            navigate("/dashboard");
+          } catch (err) {
+            console.error("Google Login Error:", err);
+
+            alert(err.response?.data?.message || "Google Login Failed");
+          }
+        }}
+        onError={(error) => {
+          console.error("Google Login ERROR:", error);
+          alert("Google Login Failed. Check Console.");
+        }}
+        theme="filled_black"
+        size="large"
+        width="350"
+      />
       <p className="text-center text-slate-400">
         Don't have an account?{" "}
         <button

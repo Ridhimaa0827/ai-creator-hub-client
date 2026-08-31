@@ -31,3 +31,9 @@ export const resetPassword = (email, otp, password) => {
     password,
   });
 };
+
+export const googleLoginUser = (credential) => {
+  return API.post("/google-login", {
+    credential,
+  });
+};

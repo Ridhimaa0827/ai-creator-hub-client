@@ -1,8 +1,29 @@
 import { FaCheckCircle, FaTimesCircle, FaCrown } from "react-icons/fa";
+import { createCheckoutSession } from "../../api/paymentApi";
 export default function Pricing() {
-  const handleUpgrade = () => {
-    alert("🚀 Payment Gateway Coming Soon!");
-  };
+  const handleUpgrade = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first.");
+      return;
+    }
+
+    const res = await createCheckoutSession(token);
+
+    if (res.data.success) {
+      window.location.href = res.data.url;
+    }
+  } catch (error) {
+    console.error("Payment Error:", error);
+
+    alert(
+      error.response?.data?.message ||
+      "Unable to start payment"
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-[#030712] text-white">
       <section className="relative overflow-hidden px-6 pt-36 pb-20">

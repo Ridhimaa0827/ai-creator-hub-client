@@ -17,6 +17,7 @@ import Settings from "../pages/dashboard/Settings";
 import Pricing from "../pages/Pricing/Pricing";
 import ForgotPassword from "../pages/ForgotPassword";
 import ProtectedRoute from "../components/ProtectedRoute";
+import PaymentSuccess from "../pages/Pricing/PaymentSuccess";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -24,6 +25,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>}>
         <Route index element={<DashboardHome />} />
