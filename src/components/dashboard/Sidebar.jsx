@@ -12,7 +12,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 const menu = [
   {
@@ -75,10 +75,10 @@ const menu = [
 export default function Sidebar() {
   return (
     <aside className="w-72 border-r border-white/10 bg-[#050816] p-6">
-      <h1 className="mb-10 text-3xl font-bold">
+      <Link to="/" className="mb-10 block text-3xl font-bold">
         <span className="text-cyan-400">AI</span>
         Creator Hub
-      </h1>
+      </Link>
 
       <nav className="space-y-2">
         {menu.map((item) => (

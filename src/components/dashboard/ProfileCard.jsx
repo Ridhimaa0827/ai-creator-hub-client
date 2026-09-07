@@ -20,16 +20,10 @@ export default function ProfileCard({ user }) {
       );
     };
 
-    window.addEventListener(
-      "creditsUpdated",
-      updateCredits
-    );
+    window.addEventListener("creditsUpdated", updateCredits);
 
     return () => {
-      window.removeEventListener(
-        "creditsUpdated",
-        updateCredits
-      );
+      window.removeEventListener("creditsUpdated", updateCredits);
     };
   }, [user.credits]);
 
@@ -42,7 +36,15 @@ export default function ProfileCard({ user }) {
 
       <div className="flex flex-col items-center">
 
-        <FaUserCircle className="text-8xl text-cyan-400" />
+        {user.avatar ? (
+          <img
+            src={user.avatar}
+            alt="Profile"
+            className="h-32 w-32 rounded-full border-4 border-cyan-400/30 object-cover shadow-[0_0_30px_rgba(34,211,238,.25)]"
+          />
+        ) : (
+          <FaUserCircle className="text-8xl text-cyan-400" />
+        )}
 
         <h3 className="mt-5 text-2xl font-bold">
           {user.name}
@@ -57,12 +59,12 @@ export default function ProfileCard({ user }) {
       <div className="mt-10 space-y-5">
 
         <div className="flex items-center gap-3">
-          <FaEnvelope />
+          <FaEnvelope className="text-cyan-400" />
           {user.email}
         </div>
 
         <div className="flex items-center gap-3">
-          <FaCoins />
+          <FaCoins className="text-cyan-400" />
           {credits} Credits
         </div>
 
